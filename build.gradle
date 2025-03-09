@@ -1,0 +1,44 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.jfree:jfreechart:1.5.3'
+	//implementation 'net.sf.jasperreports:jasperreports:6.17.0'
+	//implementation files('libs/itext-2.1.7.js8.jar')
+	//implementation files('libs/itext-2.1.7.js6.jar')
+	//implementation files('libs/itext-2.1.7.js4.jar')
+	//implementation 'com.itextpdf:itextpdf:5.5.4'
+	
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
