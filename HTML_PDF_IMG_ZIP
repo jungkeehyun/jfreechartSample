@@ -1,0 +1,71 @@
+import org.xhtmlrenderer.pdf.ITextRenderer;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.rendering.PDFRenderer;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+public class HtmlToPdfToImageZip {
+    public static void main(String[] args) throws Exception {
+        // HTML 콘텐츠 (여기에 HTML을 직접 입력하거나 외부에서 로드 가능)
+        String htmlContent = """
+            <html>
+            <head>
+                <style>
+                    @page { size: A4; margin: 20mm; }
+                    body { font-family: Arial, sans-serif; line-height: 1.5; }
+                    h1 { color: #4CAF50; }
+                    table { width: 100%; border-collapse: collapse; }
+                    th, td { border: 1px solid black; padding: 5px; text-align: left; }
+                </style>
+            </head>
+            <body>
+                <h1>HTML to PDF Example</h1>
+                <p>This is a simple PDF generated from HTML content.</p>
+                <table>
+                    <tr><th>Header 1</th><th>Header 2</th></tr>
+                    <tr><td>Cell 1</td><td>Cell 2</td></tr>
+                </table>
+            </body>
+            </html>
+        """;
+
+        // 1. HTML을 PDF로 변환
+        ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
+        ITextRenderer renderer = new ITextRenderer();
+        renderer.setDocumentFromString(htmlContent);
+        renderer.layout();
+        renderer.createPDF(pdfOutputStream);
+
+        // 2. PDF를 메모리에서 로드
+        try (PDDocument pdfDocument = PDDocument.load(pdfOutputStream.toByteArray());
+             FileOutputStream zipFileOutput = new FileOutputStream("output.zip");
+             ZipOutputStream zipOutputStream = new ZipOutputStream(zipFileOutput)) {
+
+            // 3. PDF의 각 페이지를 이미지로 변환
+            PDFRenderer pdfRenderer = new PDFRenderer(pdfDocument);
+            for (int page = 0; page < pdfDocument.getNumberOfPages(); page++) {
+                // PDF 페이지를 BufferedImage로 변환
+                BufferedImage image = pdfRenderer.renderImageWithDPI(page, 300); // 300 DPI로 렌더링
+
+                // 이미지 데이터를 메모리로 저장
+                ByteArrayOutputStream imageOutputStream = new ByteArrayOutputStream();
+                ImageIO.write(image, "png", imageOutputStream);
+
+                // ZIP에 이미지 추가
+                String imageName = "page-" + (page + 1) + ".png";
+                ZipEntry zipEntry = new ZipEntry(imageName);
+                zipOutputStream.putNextEntry(zipEntry);
+                zipOutputStream.write(imageOutputStream.toByteArray());
+                zipOutputStream.closeEntry();
+
+                // 메모리 정리
+                imageOutputStream.close();
+            }
+
+            System.out.println("HTML → PDF → 이미지 변환 및 ZIP 압축이 완료되었습니다: output.zip");
+        
