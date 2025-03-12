@@ -1,0 +1,69 @@
+
+-- DOC 파일 생성 예제 --
+
+import org.apache.poi.hwpf.HWPFDocument;
+import org.apache.poi.hwpf.usermodel.Range;
+
+import java.io.FileOutputStream;
+
+public class CreateDocExample {
+    public static void main(String[] args) {
+        try {
+            // 새로운 HWPFDocument 인스턴스 생성
+            HWPFDocument document = new HWPFDocument();
+
+            // 문서의 Range 객체 가져오기
+            Range range = document.getRange();
+
+            // 텍스트 추가
+            range.insertAfter("안녕하세요, 이 문서는 HWPF 라이브러리를 사용하여 생성되었습니다!");
+
+            // 파일 출력
+            try (FileOutputStream out = new FileOutputStream("example.doc")) {
+                document.write(out);
+            }
+
+            System.out.println("DOC 파일이 성공적으로 생성되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+-- DOCX 파일 생성 예제 --
+
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
+
+import java.io.FileOutputStream;
+
+public class CreateDocxExample {
+    public static void main(String[] args) {
+        try {
+            // 새로운 XWPFDocument 인스턴스 생성
+            XWPFDocument document = new XWPFDocument();
+
+            // 문단 생성
+            XWPFParagraph paragraph = document.createParagraph();
+
+            // 문단에 텍스트 추가
+            XWPFRun run = paragraph.createRun();
+            run.setText("안녕하세요, 이 문서는 XWPF 라이브러리를 사용하여 생성되었습니다!");
+            run.setFontSize(14);
+            run.setBold(true);
+
+            // 파일 출력
+            try (FileOutputStream out = new FileOutputStream("example.docx")) {
+                document.write(out);
+            }
+
+            System.out.println("DOCX 파일이 성공적으로 생성되었습니다.");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
